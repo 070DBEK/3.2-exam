@@ -1,56 +1,25 @@
 from django.contrib import admin
-from django.contrib.auth import get_user_model
-from django.contrib.auth.admin import UserAdmin
-from django.utils.translation import gettext_lazy as _
-
-User = get_user_model()
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from .models import User
 
 
 @admin.register(User)
-class CustomUserAdmin(UserAdmin):
-    list_display = (
-        "id",
-        "username",
-        "email",
-        "first_name",
-        "last_name",
-        "is_teacher",
-        "is_active",
-        "is_staff",
-    )
-    list_filter = ("is_teacher", "is_staff", "is_superuser", "is_active")
-    search_fields = ("username", "email", "first_name", "last_name")
-    ordering = ("username",)
+class UserAdmin(BaseUserAdmin):
+    model = User
+    list_display = ('username', 'email', 'is_teacher', 'is_staff', 'is_active', 'created_at')
+    list_filter = ('is_teacher', 'is_staff', 'is_superuser', 'is_active')
 
-    fieldsets = (
-        (None, {"fields": ("username", "password")}),
-        (_("Personal info"), {
-            "fields": (
-                "first_name",
-                "last_name",
-                "email",
-                "bio",
-                "profile_picture",
-                "is_teacher",
-            )
-        }),
-        (_("Permissions"), {
-            "fields": (
-                "is_active",
-                "is_staff",
-                "is_superuser",
-                "groups",
-                "user_permissions",
-            )
-        }),
-        (_("Important dates"), {
-            "fields": ("last_login", "date_joined")
+    fieldsets = BaseUserAdmin.fieldsets + (
+        ('Additional Info', {
+            'fields': ('is_teacher', 'bio', 'profile_picture'),
         }),
     )
 
-    add_fieldsets = (
-        (None, {
-            "classes": ("wide",),
-            "fields": ("username", "email", "password1", "password2", "is_teacher"),
+    add_fieldsets = BaseUserAdmin.add_fieldsets + (
+        ('Additional Info', {
+            'fields': ('is_teacher', 'bio', 'profile_picture'),
         }),
     )
+
+    search_fields = ('username', 'email')
+    ordering = ('-created_at',)

@@ -4,5 +4,7 @@ from .models import Review
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'course', 'rating')
-    search_fields = ('user', 'course', 'rating')
+    list_display = ('user', 'course', 'rating', 'created_at')
+    list_filter = ('rating', 'course')
+    search_fields = ('user__username', 'course__title', 'comment')
+    autocomplete_fields = ('user', 'course')
