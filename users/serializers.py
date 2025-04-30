@@ -1,22 +1,30 @@
 from rest_framework import serializers
-from .models import User
-from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth import get_user_model
 
 
-class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
-    password2 = serializers.CharField(write_only=True, required=True)
+User = get_user_model()
+
+
+class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'password2', 'first_name', 'last_name', 'is_teacher']
-
-    def validate(self, attrs):
-        if attrs['password'] != attrs['password2']:
-            raise serializers.ValidationError({"password": "Passwords do not match."})
-        return attrs
+        fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name', 'is_teacher', 'bio',
+                  'profile_picture', 'date_joined']
+        read_only_fields = ['date_joined']
+        extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        validated_data.pop('password2')
-        user = User.objects.create_user(**validated_data)
+        password = validated_data.pop('password', None)
+        user = User(**validated_data)
+        if password:
+            user.set_password(password)
+        user.save()
         return user
+
+
+class UserLightSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'first_name', 'last_name']

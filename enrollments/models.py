@@ -10,15 +10,15 @@ class Enrollment(models.Model):
     is_completed = models.BooleanField(default=False)
     completed_at = models.DateTimeField(null=True, blank=True)
 
-    def __str__(self):
-        return f"{self.user.username} - {self.course.title}"
+    class Meta:
+        unique_together = ['user', 'course']
 
 
 class Progress(models.Model):
-    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE, related_name='progresses')
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='progresses')
+    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE, related_name='progress')
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     is_completed = models.BooleanField(default=False)
     completed_at = models.DateTimeField(null=True, blank=True)
 
-    def __str__(self):
-        return f"{self.enrollment.user.username} - {self.lesson.title}"
+    class Meta:
+        unique_together = ['enrollment', 'lesson']
