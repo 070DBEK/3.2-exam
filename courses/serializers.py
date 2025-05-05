@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.db.models import Avg
 from .models import Category, Course, Module, Lesson
 from users.serializers import UserLightSerializer
 from reviews.serializers import ReviewSerializer
